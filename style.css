@@ -1,0 +1,49 @@
+.navbar-brand img {
+    max-width: 125px; /* Adjust the value as needed of the logo */
+    height: auto;
+}
+
+.bg-image {
+  position: relative;
+  max-width: none;
+}
+
+.titleCover {
+  position: absolute;
+  top: 50%; /* Positionne le titre et le paragraphe au milieu verticalement */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.25);
+  padding: 20px; /* Ajoute un espace autour du texte */
+  width: 70%; /* Ajuste la largeur du conteneur */
+  max-width: 500px; /* Définit une largeur maximale */
+}
+
+.bg-image img {
+  width: 100%;
+  height: auto;
+}
+
+.buttonPerso{
+  padding-left: 50%;
+  padding-right: 50%;
+  align-items: center;
+
+}
+
+.titlecoverGaleria{
+  position: absolute;
+  top: 30%; /* Positionne le titre et le paragraphe au milieu verticalement */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.25);
+  padding: 20px; /* Ajoute un espace autour du texte */
+  width: 70%; /* Ajuste la largeur du conteneur */
+  max-width: 500px; /* Définit une largeur maximale */
+}
