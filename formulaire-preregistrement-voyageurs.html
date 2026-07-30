@@ -1,0 +1,733 @@
+<!-- ============================================================
+     FORMULAIRE DE PRÉ-ENREGISTREMENT DES VOYAGEURS - ESENCIA LODGE
+     A coller tel quel dans un bloc "HTML personnalisé" (Gutenberg)
+     ============================================================ -->
+<div id="epf-root" class="epf-root">
+
+  <div class="epf-card">
+
+    <div class="epf-lang-switch" role="group" aria-label="Language / Idioma / Langue">
+      <button type="button" class="epf-lang-btn" data-lang="fr">FR</button>
+      <button type="button" class="epf-lang-btn" data-lang="es">ES</button>
+      <button type="button" class="epf-lang-btn" data-lang="en">EN</button>
+    </div>
+
+    <!-- ===================== ETAPE 1 : ACCUEIL ===================== -->
+    <section id="epf-step-intro" class="epf-step">
+      <h2 data-i18n="intro_title"></h2>
+      <p class="epf-intro-text" data-i18n="intro_text"></p>
+
+      <div class="epf-field">
+        <label for="epf-logement" class="epf-required" data-i18n="lbl_logement"></label>
+        <input type="text" id="epf-logement" name="logement" autocomplete="off">
+        <span class="epf-error" id="epf-err-logement"></span>
+      </div>
+
+      <div class="epf-grid-2">
+        <div class="epf-field">
+          <label for="epf-fecha-entrada" class="epf-required" data-i18n="lbl_entrada"></label>
+          <input type="date" id="epf-fecha-entrada" name="fecha_entrada">
+          <span class="epf-error" id="epf-err-entrada"></span>
+        </div>
+        <div class="epf-field">
+          <label for="epf-fecha-salida" class="epf-required" data-i18n="lbl_salida"></label>
+          <input type="date" id="epf-fecha-salida" name="fecha_salida">
+          <span class="epf-error" id="epf-err-salida"></span>
+        </div>
+      </div>
+
+      <div class="epf-field">
+        <label for="epf-num-occupants" class="epf-required" data-i18n="lbl_num_occupants"></label>
+        <input type="number" id="epf-num-occupants" name="num_occupants" min="1" max="15" value="1" inputmode="numeric">
+        <span class="epf-error" id="epf-err-num-occupants"></span>
+      </div>
+
+      <button type="button" id="epf-btn-continue" class="epf-btn epf-btn-primary" data-i18n="btn_continue"></button>
+    </section>
+
+    <!-- ===================== ETAPE 2 : OCCUPANTS + ENVOI ===================== -->
+    <form id="epf-step-occupants" class="epf-step" hidden novalidate>
+      <div id="epf-occupants-container"></div>
+
+      <div class="epf-field epf-consent">
+        <label class="epf-checkbox-label">
+          <input type="checkbox" id="epf-consent" name="consent">
+          <span data-i18n="consent_text"></span>
+        </label>
+        <span class="epf-error" id="epf-err-consent"></span>
+      </div>
+
+      <div class="epf-send-error" id="epf-send-error" hidden></div>
+
+      <div class="epf-actions">
+        <button type="button" id="epf-btn-back" class="epf-btn epf-btn-secondary" data-i18n="btn_back"></button>
+        <button type="submit" id="epf-btn-submit" class="epf-btn epf-btn-primary" data-i18n="btn_submit"></button>
+      </div>
+    </form>
+
+    <!-- ===================== ETAPE 3 : CONFIRMATION ===================== -->
+    <section id="epf-step-confirm" class="epf-step" hidden>
+      <div class="epf-confirm-icon">&#10003;</div>
+      <h2 data-i18n="confirm_title"></h2>
+      <p data-i18n="confirm_text"></p>
+    </section>
+
+  </div>
+</div>
+
+<style>
+  #epf-root, #epf-root * { box-sizing: border-box; }
+  #epf-root {
+    --epf-primary: #2c5f7c;
+    --epf-primary-dark: #204a63;
+    --epf-border: #d5dbe0;
+    --epf-bg: #f7f9fa;
+    --epf-text: #2c3338;
+    --epf-error: #b3261e;
+    --epf-radius: 6px;
+    max-width: 720px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--epf-text);
+    line-height: 1.5;
+  }
+  #epf-root .epf-card {
+    background: #fff;
+    border: 1px solid var(--epf-border);
+    border-radius: 8px;
+    padding: 24px;
+  }
+  @media (max-width: 480px) {
+    #epf-root .epf-card { padding: 16px; border-radius: 0; border-left: 0; border-right: 0; }
+  }
+  #epf-root h2 { font-size: 1.3em; margin: 0 0 12px; color: var(--epf-primary-dark); }
+  #epf-root h3 { font-size: 1.05em; margin: 0 0 14px; color: var(--epf-primary-dark); }
+  #epf-root .epf-intro-text { margin: 0 0 20px; font-size: 0.95em; }
+  #epf-root .epf-lang-switch { display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 14px; }
+  #epf-root .epf-lang-btn {
+    border: 1px solid var(--epf-border);
+    background: #fff;
+    color: var(--epf-text);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    cursor: pointer;
+  }
+  #epf-root .epf-lang-btn.epf-active { background: var(--epf-primary); color: #fff; border-color: var(--epf-primary); }
+  #epf-root .epf-field { margin-bottom: 16px; }
+  #epf-root label { display: block; font-size: 0.88em; font-weight: 600; margin-bottom: 4px; }
+  #epf-root .epf-required::after { content: " *"; color: var(--epf-error); }
+  #epf-root input[type="text"],
+  #epf-root input[type="date"],
+  #epf-root input[type="number"],
+  #epf-root input[type="tel"],
+  #epf-root input[type="email"],
+  #epf-root select {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--epf-border);
+    border-radius: var(--epf-radius);
+    font-size: 1em;
+    background: #fff;
+    color: var(--epf-text);
+  }
+  #epf-root input.epf-invalid, #epf-root select.epf-invalid { border-color: var(--epf-error); background: #fdf1f0; }
+  #epf-root .epf-error { display: block; color: var(--epf-error); font-size: 0.82em; margin-top: 4px; min-height: 0; }
+  #epf-root .epf-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px) { #epf-root .epf-grid-2 { grid-template-columns: 1fr; } }
+  #epf-root .epf-btn {
+    display: inline-block;
+    padding: 11px 22px;
+    border-radius: var(--epf-radius);
+    border: 1px solid transparent;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #epf-root .epf-btn-primary { background: var(--epf-primary); color: #fff; }
+  #epf-root .epf-btn-primary:hover { background: var(--epf-primary-dark); }
+  #epf-root .epf-btn-primary:disabled { background: #9db2bd; cursor: not-allowed; }
+  #epf-root .epf-btn-secondary { background: #fff; color: var(--epf-primary); border-color: var(--epf-primary); }
+  #epf-root .epf-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
+  #epf-root .epf-occupant-block {
+    border: 1px solid var(--epf-border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 18px;
+    background: var(--epf-bg);
+  }
+  #epf-root .epf-checkbox-label { display: flex; align-items: flex-start; gap: 8px; font-weight: 400; font-size: 0.9em; }
+  #epf-root .epf-checkbox-label input { width: auto; margin-top: 3px; flex-shrink: 0; }
+  #epf-root .epf-confirm-icon {
+    width: 56px; height: 56px; border-radius: 50%; background: #2e7d32; color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 1.6em; margin: 0 auto 16px;
+  }
+  #epf-root #epf-step-confirm { text-align: center; }
+  #epf-root .epf-send-error {
+    background: #fdf1f0; border: 1px solid var(--epf-error); color: var(--epf-error);
+    padding: 10px 12px; border-radius: var(--epf-radius); margin-bottom: 14px; font-size: 0.9em;
+  }
+  #epf-root .epf-minor-note { font-size: 0.82em; color: var(--epf-primary-dark); margin-top: -6px; margin-bottom: 12px; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* ==========================================================
+     CONFIGURATION EMAILJS - A REMPLIR APRES CREATION DU COMPTE
+     sur https://www.emailjs.com (plan gratuit)
+     ========================================================== */
+  var EMAILJS_PUBLIC_KEY  = "YOUR_EMAILJS_PUBLIC_KEY";   // Account > General > Public Key
+  var EMAILJS_SERVICE_ID  = "YOUR_EMAILJS_SERVICE_ID";   // Email Services > votre service
+  var EMAILJS_TEMPLATE_ID = "YOUR_EMAILJS_TEMPLATE_ID";  // Email Templates > votre template
+  var DEST_EMAIL           = "esencialodge@gmail.com";
+  /* ========================================================== */
+
+  if (window.emailjs && EMAILJS_PUBLIC_KEY.indexOf("YOUR_") !== 0) {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
+
+  var root = document.getElementById("epf-root");
+
+  /* ---------------------- TRADUCTIONS ---------------------- */
+  var I18N = {
+    fr: {
+      intro_title: "Pré-enregistrement des voyageurs",
+      intro_text: "Conformément à la législation espagnole sur l'hébergement touristique, tout logement doit enregistrer l'identité de ses voyageurs et transmettre ces informations aux autorités (Ministère de l'Intérieur). Merci de compléter ce formulaire avant votre arrivée : vos données seront transmises par e-mail à l'hébergeur uniquement pour cette démarche légale, et ne seront pas conservées au-delà du temps nécessaire.",
+      lbl_logement: "Nom du logement",
+      lbl_entrada: "Date d'arrivée",
+      lbl_salida: "Date de départ",
+      lbl_num_occupants: "Nombre d'occupants",
+      btn_continue: "Continuer",
+      btn_back: "Retour",
+      btn_submit: "Envoyer",
+      btn_sending: "Envoi en cours…",
+      occupant_title_main: "Voyageur principal",
+      occupant_title: "Voyageur",
+      lbl_nombre: "Prénom",
+      lbl_apellido1: "Premier nom de famille",
+      lbl_apellido2: "Second nom de famille (optionnel)",
+      lbl_tipo_doc: "Type de document",
+      opt_doc_dni: "DNI",
+      opt_doc_nie: "NIE",
+      opt_doc_pas: "Passeport",
+      opt_doc_otro: "Autre",
+      lbl_num_doc: "Numéro de document",
+      lbl_fecha_nac: "Date de naissance",
+      lbl_nacionalidad: "Nationalité",
+      lbl_sexo: "Sexe",
+      opt_sexo_h: "Homme",
+      opt_sexo_m: "Femme",
+      opt_sexo_o: "Autre",
+      lbl_direccion: "Adresse postale complète",
+      lbl_telefono: "Téléphone",
+      lbl_email: "E-mail",
+      lbl_parentesco: "Lien de parenté avec le voyageur principal",
+      minor_note: "Voyageur mineur : le lien de parenté avec le voyageur principal est requis.",
+      consent_text: "J'ai lu et j'accepte que mes données personnelles (et celles des personnes que j'enregistre) soient utilisées exclusivement pour remplir l'obligation légale d'enregistrement des voyageurs auprès des autorités espagnoles, qu'elles soient transmises par e-mail au responsable du logement à cette seule fin, et qu'elles ne soient pas conservées au-delà du temps strictement nécessaire à cette démarche.",
+      confirm_title: "Merci !",
+      confirm_text: "Votre pré-enregistrement a bien été envoyé à l'hébergeur. Vous pouvez fermer cette page.",
+      err_required: "Ce champ est obligatoire.",
+      err_dates: "La date de départ doit être postérieure à la date d'arrivée.",
+      err_num_occupants: "Merci d'indiquer au moins 1 occupant.",
+      err_email: "Adresse e-mail invalide.",
+      err_consent: "Merci d'accepter cette condition pour continuer.",
+      err_send: "L'envoi a échoué. Vérifiez votre connexion et réessayez, ou contactez directement l'hébergeur à " + DEST_EMAIL + "."
+    },
+    es: {
+      intro_title: "Pre-registro de viajeros",
+      intro_text: "De acuerdo con la normativa española sobre alojamientos turísticos, todo alojamiento debe registrar la identidad de sus viajeros y transmitir estos datos a las autoridades (Ministerio del Interior). Por favor, complete este formulario antes de su llegada: sus datos se enviarán por correo electrónico al responsable del alojamiento únicamente para este trámite legal y no se conservarán más tiempo del necesario.",
+      lbl_logement: "Nombre del alojamiento",
+      lbl_entrada: "Fecha de entrada",
+      lbl_salida: "Fecha de salida",
+      lbl_num_occupants: "Número de ocupantes",
+      btn_continue: "Continuar",
+      btn_back: "Volver",
+      btn_submit: "Enviar",
+      btn_sending: "Enviando…",
+      occupant_title_main: "Viajero principal",
+      occupant_title: "Viajero",
+      lbl_nombre: "Nombre",
+      lbl_apellido1: "Primer apellido",
+      lbl_apellido2: "Segundo apellido (opcional)",
+      lbl_tipo_doc: "Tipo de documento",
+      opt_doc_dni: "DNI",
+      opt_doc_nie: "NIE",
+      opt_doc_pas: "Pasaporte",
+      opt_doc_otro: "Otro",
+      lbl_num_doc: "Número de documento",
+      lbl_fecha_nac: "Fecha de nacimiento",
+      lbl_nacionalidad: "Nacionalidad",
+      lbl_sexo: "Sexo",
+      opt_sexo_h: "Hombre",
+      opt_sexo_m: "Mujer",
+      opt_sexo_o: "Otro",
+      lbl_direccion: "Dirección postal completa",
+      lbl_telefono: "Teléfono",
+      lbl_email: "Correo electrónico",
+      lbl_parentesco: "Parentesco con el viajero principal",
+      minor_note: "Viajero menor de edad: el parentesco con el viajero principal es obligatorio.",
+      consent_text: "He leído y acepto que mis datos personales (y los de las personas que registro) sean utilizados exclusivamente para cumplir con la obligación legal de registro de viajeros ante las autoridades españolas, que sean transmitidos por correo electrónico al responsable del alojamiento con esta única finalidad, y que no se conservarán más tiempo del estrictamente necesario para dicho trámite.",
+      confirm_title: "¡Gracias!",
+      confirm_text: "Su pre-registro se ha enviado correctamente al alojamiento. Ya puede cerrar esta página.",
+      err_required: "Este campo es obligatorio.",
+      err_dates: "La fecha de salida debe ser posterior a la fecha de entrada.",
+      err_num_occupants: "Indique al menos 1 ocupante.",
+      err_email: "Correo electrónico no válido.",
+      err_consent: "Debe aceptar esta condición para continuar.",
+      err_send: "El envío ha fallado. Compruebe su conexión e inténtelo de nuevo, o contacte directamente con el alojamiento en " + DEST_EMAIL + "."
+    },
+    en: {
+      intro_title: "Traveler pre-registration",
+      intro_text: "Under Spanish accommodation law, every property must register the identity of its guests and submit this information to the authorities (Ministry of the Interior). Please complete this form before arrival: your data will be sent by e-mail to the host solely for this legal requirement and will not be kept longer than necessary.",
+      lbl_logement: "Property name",
+      lbl_entrada: "Check-in date",
+      lbl_salida: "Check-out date",
+      lbl_num_occupants: "Number of guests",
+      btn_continue: "Continue",
+      btn_back: "Back",
+      btn_submit: "Submit",
+      btn_sending: "Sending…",
+      occupant_title_main: "Main guest",
+      occupant_title: "Guest",
+      lbl_nombre: "First name",
+      lbl_apellido1: "First surname",
+      lbl_apellido2: "Second surname (optional)",
+      lbl_tipo_doc: "Document type",
+      opt_doc_dni: "DNI",
+      opt_doc_nie: "NIE",
+      opt_doc_pas: "Passport",
+      opt_doc_otro: "Other",
+      lbl_num_doc: "Document number",
+      lbl_fecha_nac: "Date of birth",
+      lbl_nacionalidad: "Nationality",
+      lbl_sexo: "Sex",
+      opt_sexo_h: "Male",
+      opt_sexo_m: "Female",
+      opt_sexo_o: "Other",
+      lbl_direccion: "Full postal address",
+      lbl_telefono: "Phone",
+      lbl_email: "Email",
+      lbl_parentesco: "Relationship to the main guest",
+      minor_note: "Minor guest: relationship to the main guest is required.",
+      consent_text: "I have read and agree that my personal data (and that of the people I am registering) will be used solely to comply with the legal obligation to register travelers with the Spanish authorities, that it will be sent by e-mail to the host for this sole purpose, and that it will not be kept longer than strictly necessary for this procedure.",
+      confirm_title: "Thank you!",
+      confirm_text: "Your pre-registration has been sent to the host. You may now close this page.",
+      err_required: "This field is required.",
+      err_dates: "The check-out date must be after the check-in date.",
+      err_num_occupants: "Please indicate at least 1 guest.",
+      err_email: "Invalid email address.",
+      err_consent: "You must accept this condition to continue.",
+      err_send: "Sending failed. Please check your connection and try again, or contact the host directly at " + DEST_EMAIL + "."
+    }
+  };
+
+  var DOC_TYPES = [
+    { value: "DNI",  key: "opt_doc_dni" },
+    { value: "NIE",  key: "opt_doc_nie" },
+    { value: "PAS",  key: "opt_doc_pas" },
+    { value: "OTRO", key: "opt_doc_otro" }
+  ];
+  var SEXO_TYPES = [
+    { value: "H", key: "opt_sexo_h" },
+    { value: "M", key: "opt_sexo_m" },
+    { value: "O", key: "opt_sexo_o" }
+  ];
+
+  var currentLang = detectLang();
+
+  function detectLang() {
+    var nav = (navigator.language || "en").toLowerCase();
+    if (nav.indexOf("es") === 0) return "es";
+    if (nav.indexOf("fr") === 0) return "fr";
+    return "en";
+  }
+
+  function t(key) {
+    return (I18N[currentLang] && I18N[currentLang][key]) || key;
+  }
+
+  function applyTranslations() {
+    root.querySelectorAll("[data-i18n]").forEach(function (el) {
+      el.textContent = t(el.getAttribute("data-i18n"));
+    });
+    root.querySelectorAll(".epf-lang-btn").forEach(function (btn) {
+      btn.classList.toggle("epf-active", btn.getAttribute("data-lang") === currentLang);
+    });
+    if (occupantsBuilt) buildOccupants(); // regenerate labels of dynamic blocks
+  }
+
+  root.querySelectorAll(".epf-lang-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      currentLang = btn.getAttribute("data-lang");
+      applyTranslations();
+    });
+  });
+
+  /* ---------------------- PRE-REMPLISSAGE VIA URL ---------------------- */
+  var params = new URLSearchParams(window.location.search);
+  var logementParam = params.get("logement");
+  var logementInput = document.getElementById("epf-logement");
+  if (logementParam) {
+    logementInput.value = logementParam;
+  }
+
+  /* ---------------------- ETAPE 1 -> ETAPE 2 ---------------------- */
+  var stepIntro = document.getElementById("epf-step-intro");
+  var stepOccupants = document.getElementById("epf-step-occupants");
+  var stepConfirm = document.getElementById("epf-step-confirm");
+  var occupantsContainer = document.getElementById("epf-occupants-container");
+  var occupantsBuilt = false;
+  var arrivalDateValue = null;
+
+  document.getElementById("epf-btn-continue").addEventListener("click", function () {
+    var ok = true;
+
+    var logementVal = logementInput.value.trim();
+    var entradaEl = document.getElementById("epf-fecha-entrada");
+    var salidaEl = document.getElementById("epf-fecha-salida");
+    var numEl = document.getElementById("epf-num-occupants");
+
+    clearFieldError(logementInput, "epf-err-logement");
+    clearFieldError(entradaEl, "epf-err-entrada");
+    clearFieldError(salidaEl, "epf-err-salida");
+    clearFieldError(numEl, "epf-err-num-occupants");
+
+    if (!logementVal) { setFieldError(logementInput, "epf-err-logement", t("err_required")); ok = false; }
+    if (!entradaEl.value) { setFieldError(entradaEl, "epf-err-entrada", t("err_required")); ok = false; }
+    if (!salidaEl.value) { setFieldError(salidaEl, "epf-err-salida", t("err_required")); ok = false; }
+    if (entradaEl.value && salidaEl.value && salidaEl.value <= entradaEl.value) {
+      setFieldError(salidaEl, "epf-err-salida", t("err_dates"));
+      ok = false;
+    }
+    var numVal = parseInt(numEl.value, 10);
+    if (!numVal || numVal < 1) { setFieldError(numEl, "epf-err-num-occupants", t("err_num_occupants")); ok = false; }
+
+    if (!ok) return;
+
+    arrivalDateValue = entradaEl.value;
+    buildOccupants();
+    stepIntro.hidden = true;
+    stepOccupants.hidden = false;
+    window.scrollTo({ top: root.offsetTop - 20, behavior: "smooth" });
+  });
+
+  document.getElementById("epf-btn-back").addEventListener("click", function () {
+    stepOccupants.hidden = true;
+    stepIntro.hidden = false;
+  });
+
+  /* ---------------------- GENERATION DES BLOCS OCCUPANTS ---------------------- */
+  function buildOccupants() {
+    var n = parseInt(document.getElementById("epf-num-occupants").value, 10) || 1;
+    var previousValues = collectOccupantValues();
+    occupantsContainer.innerHTML = "";
+
+    for (var i = 0; i < n; i++) {
+      occupantsContainer.appendChild(buildOccupantBlock(i));
+    }
+    occupantsBuilt = true;
+    restoreOccupantValues(previousValues);
+    attachMinorListeners();
+  }
+
+  function buildOccupantBlock(index) {
+    var isMain = index === 0;
+    var wrap = document.createElement("div");
+    wrap.className = "epf-occupant-block";
+    wrap.setAttribute("data-occupant-index", index);
+
+    var title = isMain ? t("occupant_title_main") : (t("occupant_title") + " " + (index + 1));
+
+    var html = "";
+    html += '<h3>' + escapeHtml(title) + '</h3>';
+
+    html += fieldText(index, "nombre", t("lbl_nombre"), true);
+    html += '<div class="epf-grid-2">';
+    html += fieldText(index, "apellido1", t("lbl_apellido1"), true);
+    html += fieldText(index, "apellido2", t("lbl_apellido2"), false);
+    html += '</div>';
+
+    html += '<div class="epf-grid-2">';
+    html += fieldSelect(index, "tipo_doc", t("lbl_tipo_doc"), DOC_TYPES, true);
+    html += fieldText(index, "num_doc", t("lbl_num_doc"), true);
+    html += '</div>';
+
+    html += '<div class="epf-grid-2">';
+    html += fieldDate(index, "fecha_nac", t("lbl_fecha_nac"), true);
+    html += fieldText(index, "nacionalidad", t("lbl_nacionalidad"), true);
+    html += '</div>';
+
+    html += fieldSelect(index, "sexo", t("lbl_sexo"), SEXO_TYPES, true);
+
+    if (isMain) {
+      html += fieldText(index, "direccion", t("lbl_direccion"), true);
+      html += '<div class="epf-grid-2">';
+      html += fieldTel(index, "telefono", t("lbl_telefono"), true);
+      html += fieldEmail(index, "email", t("lbl_email"), true);
+      html += '</div>';
+    }
+
+    html += '<div class="epf-minor-wrap" data-minor-wrap hidden>';
+    html += '<p class="epf-minor-note">' + escapeHtml(t("minor_note")) + '</p>';
+    html += fieldText(index, "parentesco", t("lbl_parentesco"), false, "parentesco-input");
+    html += '</div>';
+
+    wrap.innerHTML = html;
+    return wrap;
+  }
+
+  function fieldId(index, name) { return "epf-occ-" + index + "-" + name; }
+
+  function fieldText(index, name, label, required, extraClass) {
+    var id = fieldId(index, name);
+    return '' +
+      '<div class="epf-field' + (extraClass ? " " + extraClass : "") + '">' +
+      '<label for="' + id + '"' + (required ? ' class="epf-required"' : '') + '>' + escapeHtml(label) + '</label>' +
+      '<input type="text" id="' + id + '" data-name="' + name + '" data-required="' + (required ? "1" : "0") + '" autocomplete="off">' +
+      '<span class="epf-error" data-err-for="' + id + '"></span>' +
+      '</div>';
+  }
+
+  function fieldTel(index, name, label, required) {
+    var id = fieldId(index, name);
+    return '' +
+      '<div class="epf-field">' +
+      '<label for="' + id + '"' + (required ? ' class="epf-required"' : '') + '>' + escapeHtml(label) + '</label>' +
+      '<input type="tel" id="' + id + '" data-name="' + name + '" data-required="' + (required ? "1" : "0") + '" autocomplete="off">' +
+      '<span class="epf-error" data-err-for="' + id + '"></span>' +
+      '</div>';
+  }
+
+  function fieldEmail(index, name, label, required) {
+    var id = fieldId(index, name);
+    return '' +
+      '<div class="epf-field">' +
+      '<label for="' + id + '"' + (required ? ' class="epf-required"' : '') + '>' + escapeHtml(label) + '</label>' +
+      '<input type="email" id="' + id + '" data-name="' + name + '" data-required="' + (required ? "1" : "0") + '" autocomplete="off">' +
+      '<span class="epf-error" data-err-for="' + id + '"></span>' +
+      '</div>';
+  }
+
+  function fieldDate(index, name, label, required) {
+    var id = fieldId(index, name);
+    return '' +
+      '<div class="epf-field">' +
+      '<label for="' + id + '"' + (required ? ' class="epf-required"' : '') + '>' + escapeHtml(label) + '</label>' +
+      '<input type="date" id="' + id + '" data-name="' + name + '" data-required="' + (required ? "1" : "0") + '">' +
+      '<span class="epf-error" data-err-for="' + id + '"></span>' +
+      '</div>';
+  }
+
+  function fieldSelect(index, name, label, options, required) {
+    var id = fieldId(index, name);
+    var opts = '<option value=""></option>';
+    options.forEach(function (o) {
+      opts += '<option value="' + o.value + '">' + escapeHtml(t(o.key)) + '</option>';
+    });
+    return '' +
+      '<div class="epf-field">' +
+      '<label for="' + id + '"' + (required ? ' class="epf-required"' : '') + '>' + escapeHtml(label) + '</label>' +
+      '<select id="' + id + '" data-name="' + name + '" data-required="' + (required ? "1" : "0") + '">' + opts + '</select>' +
+      '<span class="epf-error" data-err-for="' + id + '"></span>' +
+      '</div>';
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = str == null ? "" : String(str);
+    return div.innerHTML;
+  }
+
+  /* ---------------------- MINEURS ---------------------- */
+  function attachMinorListeners() {
+    occupantsContainer.querySelectorAll(".epf-occupant-block").forEach(function (block) {
+      var index = block.getAttribute("data-occupant-index");
+      var dobInput = block.querySelector('[data-name="fecha_nac"]');
+      var minorWrap = block.querySelector("[data-minor-wrap]");
+      var parentescoInput = block.querySelector(".parentesco-input input");
+      if (!dobInput) return;
+
+      function evaluate() {
+        var isMinor = isDateMinor(dobInput.value, arrivalDateValue);
+        minorWrap.hidden = !isMinor;
+        if (parentescoInput) parentescoInput.setAttribute("data-required", isMinor ? "1" : "0");
+      }
+      dobInput.addEventListener("change", evaluate);
+      evaluate();
+    });
+  }
+
+  function isDateMinor(dobStr, refDateStr) {
+    if (!dobStr) return false;
+    var dob = new Date(dobStr + "T00:00:00");
+    var ref = refDateStr ? new Date(refDateStr + "T00:00:00") : new Date();
+    if (isNaN(dob.getTime())) return false;
+    var age = ref.getFullYear() - dob.getFullYear();
+    var m = ref.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && ref.getDate() < dob.getDate())) age--;
+    return age < 18;
+  }
+
+  /* ---------------------- CONSERVATION DES VALEURS SAISIES ---------------------- */
+  function collectOccupantValues() {
+    var data = {};
+    occupantsContainer.querySelectorAll("input, select").forEach(function (el) {
+      if (el.id) data[el.id] = el.value;
+    });
+    return data;
+  }
+  function restoreOccupantValues(data) {
+    Object.keys(data).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.value = data[id];
+    });
+    attachMinorListeners();
+  }
+
+  /* ---------------------- VALIDATION / ERREURS ---------------------- */
+  function setFieldError(el, errId, message) {
+    el.classList.add("epf-invalid");
+    var errEl = document.getElementById(errId) || document.querySelector('[data-err-for="' + el.id + '"]');
+    if (errEl) errEl.textContent = message;
+  }
+  function clearFieldError(el, errId) {
+    el.classList.remove("epf-invalid");
+    var errEl = document.getElementById(errId) || document.querySelector('[data-err-for="' + el.id + '"]');
+    if (errEl) errEl.textContent = "";
+  }
+
+  function validateOccupants() {
+    var ok = true;
+    var firstInvalid = null;
+    occupantsContainer.querySelectorAll("input, select").forEach(function (el) {
+      var isRequired = el.getAttribute("data-required") === "1";
+      var errEl = document.querySelector('[data-err-for="' + el.id + '"]');
+      el.classList.remove("epf-invalid");
+      if (errEl) errEl.textContent = "";
+
+      if (isRequired && !el.value.trim()) {
+        el.classList.add("epf-invalid");
+        if (errEl) errEl.textContent = t("err_required");
+        ok = false;
+        if (!firstInvalid) firstInvalid = el;
+        return;
+      }
+      if (el.type === "email" && el.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim())) {
+        el.classList.add("epf-invalid");
+        if (errEl) errEl.textContent = t("err_email");
+        ok = false;
+        if (!firstInvalid) firstInvalid = el;
+      }
+    });
+
+    var consentEl = document.getElementById("epf-consent");
+    var consentErr = document.getElementById("epf-err-consent");
+    if (!consentEl.checked) {
+      consentErr.textContent = t("err_consent");
+      ok = false;
+      if (!firstInvalid) firstInvalid = consentEl;
+    } else {
+      consentErr.textContent = "";
+    }
+
+    if (firstInvalid) firstInvalid.focus();
+    return ok;
+  }
+
+  /* ---------------------- CONSTRUCTION DU CORPS DE L'E-MAIL ---------------------- */
+  function buildEmailBody() {
+    var lines = [];
+    var logementVal = logementInput.value.trim();
+    var entrada = document.getElementById("epf-fecha-entrada").value;
+    var salida = document.getElementById("epf-fecha-salida").value;
+    var docLabel = {};
+    DOC_TYPES.forEach(function (o) { docLabel[o.value] = t(o.key); });
+    var sexoLabel = {};
+    SEXO_TYPES.forEach(function (o) { sexoLabel[o.value] = t(o.key); });
+
+    lines.push("PRE-REGISTRO DE VIAJEROS / TRAVELER PRE-REGISTRATION");
+    lines.push("========================================");
+    lines.push("Alojamiento / Logement: " + logementVal);
+    lines.push("Fecha de entrada: " + entrada);
+    lines.push("Fecha de salida: " + salida);
+    lines.push("");
+
+    var blocks = occupantsContainer.querySelectorAll(".epf-occupant-block");
+    blocks.forEach(function (block, i) {
+      var v = function (name) {
+        var el = block.querySelector('[data-name="' + name + '"]');
+        return el ? el.value.trim() : "";
+      };
+      var isMain = i === 0;
+      lines.push("---- Viajero " + (i + 1) + (isMain ? " (titular / principal)" : "") + " ----");
+      lines.push("Primer apellido: " + v("apellido1"));
+      if (v("apellido2")) lines.push("Segundo apellido: " + v("apellido2"));
+      lines.push("Nombre: " + v("nombre"));
+      lines.push("Tipo de documento: " + (docLabel[v("tipo_doc")] || v("tipo_doc")));
+      lines.push("Numero de documento: " + v("num_doc"));
+      lines.push("Nacionalidad: " + v("nacionalidad"));
+      lines.push("Fecha de nacimiento: " + v("fecha_nac"));
+      lines.push("Sexo: " + (sexoLabel[v("sexo")] || v("sexo")));
+      if (isMain) {
+        lines.push("Direccion postal: " + v("direccion"));
+        lines.push("Telefono: " + v("telefono"));
+        lines.push("Email: " + v("email"));
+      }
+      var parentescoEl = block.querySelector(".parentesco-input input");
+      if (parentescoEl && parentescoEl.getAttribute("data-required") === "1") {
+        lines.push("Parentesco con el viajero principal: " + parentescoEl.value.trim());
+      }
+      lines.push("");
+    });
+
+    return lines.join("\n");
+  }
+
+  /* ---------------------- ENVOI ---------------------- */
+  var sendErrorEl = document.getElementById("epf-send-error");
+  var submitBtn = document.getElementById("epf-btn-submit");
+
+  stepOccupants.addEventListener("submit", function (e) {
+    e.preventDefault();
+    sendErrorEl.hidden = true;
+
+    if (!validateOccupants()) return;
+
+    var mainEmailEl = occupantsContainer.querySelector('[data-name="email"]');
+    var replyTo = mainEmailEl ? mainEmailEl.value.trim() : "";
+    var messageBody = buildEmailBody();
+
+    if (EMAILJS_PUBLIC_KEY.indexOf("YOUR_") === 0) {
+      sendErrorEl.textContent = "Configuration EmailJS manquante (clés à renseigner dans le script).";
+      sendErrorEl.hidden = false;
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = t("btn_sending");
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: DEST_EMAIL,
+      reply_to: replyTo,
+      logement: logementInput.value.trim(),
+      fecha_entrada: document.getElementById("epf-fecha-entrada").value,
+      fecha_salida: document.getElementById("epf-fecha-salida").value,
+      message: messageBody
+    }).then(function () {
+      stepOccupants.hidden = true;
+      stepConfirm.hidden = false;
+      window.scrollTo({ top: root.offsetTop - 20, behavior: "smooth" });
+    }).catch(function () {
+      sendErrorEl.textContent = t("err_send");
+      sendErrorEl.hidden = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = t("btn_submit");
+    });
+  });
+
+  applyTranslations();
+})();
+</script>
