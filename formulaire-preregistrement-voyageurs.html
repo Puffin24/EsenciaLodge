@@ -185,8 +185,10 @@
   var DEST_EMAIL           = "esencialodge@gmail.com";
   /* ========================================================== */
 
-  if (window.emailjs && EMAILJS_PUBLIC_KEY.indexOf("YOUR_") !== 0) {
-    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  if (window.emailjs) {
+    if (EMAILJS_PUBLIC_KEY.indexOf("YOUR_") !== 0) {
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    }
   }
 
   var root = document.getElementById("epf-root");
@@ -346,7 +348,9 @@
   }
 
   function t(key) {
-    return (I18N[currentLang] && I18N[currentLang][key]) || key;
+    var dict = I18N[currentLang];
+    if (!dict) return key;
+    return dict[key] || key;
   }
 
   function applyTranslations() {
@@ -398,9 +402,13 @@
     if (!logementVal) { setFieldError(logementInput, "epf-err-logement", t("err_required")); ok = false; }
     if (!entradaEl.value) { setFieldError(entradaEl, "epf-err-entrada", t("err_required")); ok = false; }
     if (!salidaEl.value) { setFieldError(salidaEl, "epf-err-salida", t("err_required")); ok = false; }
-    if (entradaEl.value && salidaEl.value && salidaEl.value <= entradaEl.value) {
-      setFieldError(salidaEl, "epf-err-salida", t("err_dates"));
-      ok = false;
+    if (entradaEl.value) {
+      if (salidaEl.value) {
+        if (salidaEl.value <= entradaEl.value) {
+          setFieldError(salidaEl, "epf-err-salida", t("err_dates"));
+          ok = false;
+        }
+      }
     }
     var numVal = parseInt(numEl.value, 10);
     if (!numVal || numVal < 1) { setFieldError(numEl, "epf-err-num-occupants", t("err_num_occupants")); ok = false; }
@@ -567,7 +575,11 @@
     if (isNaN(dob.getTime())) return false;
     var age = ref.getFullYear() - dob.getFullYear();
     var m = ref.getMonth() - dob.getMonth();
-    if (m < 0 || (m === 0 && ref.getDate() < dob.getDate())) age--;
+    var dayIsEarlier = false;
+    if (m === 0) {
+      if (ref.getDate() < dob.getDate()) dayIsEarlier = true;
+    }
+    if (m < 0 || dayIsEarlier) age--;
     return age < 18;
   }
 
@@ -608,18 +620,24 @@
       el.classList.remove("epf-invalid");
       if (errEl) errEl.textContent = "";
 
-      if (isRequired && !el.value.trim()) {
-        el.classList.add("epf-invalid");
-        if (errEl) errEl.textContent = t("err_required");
-        ok = false;
-        if (!firstInvalid) firstInvalid = el;
-        return;
+      if (isRequired) {
+        if (!el.value.trim()) {
+          el.classList.add("epf-invalid");
+          if (errEl) errEl.textContent = t("err_required");
+          ok = false;
+          if (!firstInvalid) firstInvalid = el;
+          return;
+        }
       }
-      if (el.type === "email" && el.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim())) {
-        el.classList.add("epf-invalid");
-        if (errEl) errEl.textContent = t("err_email");
-        ok = false;
-        if (!firstInvalid) firstInvalid = el;
+      if (el.type === "email") {
+        if (el.value.trim()) {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim())) {
+            el.classList.add("epf-invalid");
+            if (errEl) errEl.textContent = t("err_email");
+            ok = false;
+            if (!firstInvalid) firstInvalid = el;
+          }
+        }
       }
     });
 
@@ -677,8 +695,10 @@
         lines.push("Email: " + v("email"));
       }
       var parentescoEl = block.querySelector(".parentesco-input input");
-      if (parentescoEl && parentescoEl.getAttribute("data-required") === "1") {
-        lines.push("Parentesco con el viajero principal: " + parentescoEl.value.trim());
+      if (parentescoEl) {
+        if (parentescoEl.getAttribute("data-required") === "1") {
+          lines.push("Parentesco con el viajero principal: " + parentescoEl.value.trim());
+        }
       }
       lines.push("");
     });
