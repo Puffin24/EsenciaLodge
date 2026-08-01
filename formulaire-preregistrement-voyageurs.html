@@ -17,24 +17,7 @@
       <h2 data-i18n="intro_title"></h2>
       <p class="epf-intro-text" data-i18n="intro_text"></p>
 
-      <div class="epf-field">
-        <label for="epf-logement" class="epf-required" data-i18n="lbl_logement"></label>
-        <input type="text" id="epf-logement" name="logement" autocomplete="off">
-        <span class="epf-error" id="epf-err-logement"></span>
-      </div>
-
-      <div class="epf-grid-2">
-        <div class="epf-field">
-          <label for="epf-fecha-entrada" class="epf-required" data-i18n="lbl_entrada"></label>
-          <input type="date" id="epf-fecha-entrada" name="fecha_entrada">
-          <span class="epf-error" id="epf-err-entrada"></span>
-        </div>
-        <div class="epf-field">
-          <label for="epf-fecha-salida" class="epf-required" data-i18n="lbl_salida"></label>
-          <input type="date" id="epf-fecha-salida" name="fecha_salida">
-          <span class="epf-error" id="epf-err-salida"></span>
-        </div>
-      </div>
+      <input type="hidden" id="epf-logement" name="logement">
 
       <div class="epf-field">
         <label for="epf-num-occupants" class="epf-required" data-i18n="lbl_num_occupants"></label>
@@ -198,9 +181,6 @@
     fr: {
       intro_title: "Pré-enregistrement des voyageurs",
       intro_text: "Conformément à la législation espagnole sur l'hébergement touristique, tout logement doit enregistrer l'identité de ses voyageurs et transmettre ces informations aux autorités (Ministère de l'Intérieur). Merci de compléter ce formulaire avant votre arrivée : vos données seront transmises par e-mail à l'hébergeur uniquement pour cette démarche légale, et ne seront pas conservées au-delà du temps nécessaire.",
-      lbl_logement: "Nom du logement",
-      lbl_entrada: "Date d'arrivée",
-      lbl_salida: "Date de départ",
       lbl_num_occupants: "Nombre d'occupants",
       btn_continue: "Continuer",
       btn_back: "Retour",
@@ -232,7 +212,6 @@
       confirm_title: "Merci !",
       confirm_text: "Votre pré-enregistrement a bien été envoyé à l'hébergeur. Vous pouvez fermer cette page.",
       err_required: "Ce champ est obligatoire.",
-      err_dates: "La date de départ doit être postérieure à la date d'arrivée.",
       err_num_occupants: "Merci d'indiquer au moins 1 occupant.",
       err_email: "Adresse e-mail invalide.",
       err_consent: "Merci d'accepter cette condition pour continuer.",
@@ -241,9 +220,6 @@
     es: {
       intro_title: "Pre-registro de viajeros",
       intro_text: "De acuerdo con la normativa española sobre alojamientos turísticos, todo alojamiento debe registrar la identidad de sus viajeros y transmitir estos datos a las autoridades (Ministerio del Interior). Por favor, complete este formulario antes de su llegada: sus datos se enviarán por correo electrónico al responsable del alojamiento únicamente para este trámite legal y no se conservarán más tiempo del necesario.",
-      lbl_logement: "Nombre del alojamiento",
-      lbl_entrada: "Fecha de entrada",
-      lbl_salida: "Fecha de salida",
       lbl_num_occupants: "Número de ocupantes",
       btn_continue: "Continuar",
       btn_back: "Volver",
@@ -275,7 +251,6 @@
       confirm_title: "¡Gracias!",
       confirm_text: "Su pre-registro se ha enviado correctamente al alojamiento. Ya puede cerrar esta página.",
       err_required: "Este campo es obligatorio.",
-      err_dates: "La fecha de salida debe ser posterior a la fecha de entrada.",
       err_num_occupants: "Indique al menos 1 ocupante.",
       err_email: "Correo electrónico no válido.",
       err_consent: "Debe aceptar esta condición para continuar.",
@@ -284,9 +259,6 @@
     en: {
       intro_title: "Traveler pre-registration",
       intro_text: "Under Spanish accommodation law, every property must register the identity of its guests and submit this information to the authorities (Ministry of the Interior). Please complete this form before arrival: your data will be sent by e-mail to the host solely for this legal requirement and will not be kept longer than necessary.",
-      lbl_logement: "Property name",
-      lbl_entrada: "Check-in date",
-      lbl_salida: "Check-out date",
       lbl_num_occupants: "Number of guests",
       btn_continue: "Continue",
       btn_back: "Back",
@@ -318,7 +290,6 @@
       confirm_title: "Thank you!",
       confirm_text: "Your pre-registration has been sent to the host. You may now close this page.",
       err_required: "This field is required.",
-      err_dates: "The check-out date must be after the check-in date.",
       err_num_occupants: "Please indicate at least 1 guest.",
       err_email: "Invalid email address.",
       err_consent: "You must accept this condition to continue.",
@@ -384,38 +355,18 @@
   var stepConfirm = document.getElementById("epf-step-confirm");
   var occupantsContainer = document.getElementById("epf-occupants-container");
   var occupantsBuilt = false;
-  var arrivalDateValue = null;
 
   document.getElementById("epf-btn-continue").addEventListener("click", function () {
     var ok = true;
 
-    var logementVal = logementInput.value.trim();
-    var entradaEl = document.getElementById("epf-fecha-entrada");
-    var salidaEl = document.getElementById("epf-fecha-salida");
     var numEl = document.getElementById("epf-num-occupants");
-
-    clearFieldError(logementInput, "epf-err-logement");
-    clearFieldError(entradaEl, "epf-err-entrada");
-    clearFieldError(salidaEl, "epf-err-salida");
     clearFieldError(numEl, "epf-err-num-occupants");
 
-    if (!logementVal) { setFieldError(logementInput, "epf-err-logement", t("err_required")); ok = false; }
-    if (!entradaEl.value) { setFieldError(entradaEl, "epf-err-entrada", t("err_required")); ok = false; }
-    if (!salidaEl.value) { setFieldError(salidaEl, "epf-err-salida", t("err_required")); ok = false; }
-    if (entradaEl.value) {
-      if (salidaEl.value) {
-        if (salidaEl.value <= entradaEl.value) {
-          setFieldError(salidaEl, "epf-err-salida", t("err_dates"));
-          ok = false;
-        }
-      }
-    }
     var numVal = parseInt(numEl.value, 10);
     if (!numVal || numVal < 1) { setFieldError(numEl, "epf-err-num-occupants", t("err_num_occupants")); ok = false; }
 
     if (!ok) return;
 
-    arrivalDateValue = entradaEl.value;
     buildOccupants();
     stepIntro.hidden = true;
     stepOccupants.hidden = false;
@@ -559,7 +510,7 @@
       if (!dobInput) return;
 
       function evaluate() {
-        var isMinor = isDateMinor(dobInput.value, arrivalDateValue);
+        var isMinor = isDateMinor(dobInput.value);
         minorWrap.hidden = !isMinor;
         if (parentescoInput) parentescoInput.setAttribute("data-required", isMinor ? "1" : "0");
       }
@@ -659,8 +610,6 @@
   function buildEmailBody() {
     var lines = [];
     var logementVal = logementInput.value.trim();
-    var entrada = document.getElementById("epf-fecha-entrada").value;
-    var salida = document.getElementById("epf-fecha-salida").value;
     var docLabel = {};
     DOC_TYPES.forEach(function (o) { docLabel[o.value] = t(o.key); });
     var sexoLabel = {};
@@ -668,9 +617,7 @@
 
     lines.push("PRE-REGISTRO DE VIAJEROS / TRAVELER PRE-REGISTRATION");
     lines.push("========================================");
-    lines.push("Alojamiento / Logement: " + logementVal);
-    lines.push("Fecha de entrada: " + entrada);
-    lines.push("Fecha de salida: " + salida);
+    if (logementVal) lines.push("Alojamiento / Logement: " + logementVal);
     lines.push("");
 
     var blocks = occupantsContainer.querySelectorAll(".epf-occupant-block");
@@ -733,14 +680,13 @@
       to_email: DEST_EMAIL,
       reply_to: replyTo,
       logement: logementInput.value.trim(),
-      fecha_entrada: document.getElementById("epf-fecha-entrada").value,
-      fecha_salida: document.getElementById("epf-fecha-salida").value,
       message: messageBody
     }).then(function () {
       stepOccupants.hidden = true;
       stepConfirm.hidden = false;
       window.scrollTo({ top: root.offsetTop - 20, behavior: "smooth" });
-    }).catch(function () {
+    }).catch(function (err) {
+      console.error("EmailJS send failed:", err);
       sendErrorEl.textContent = t("err_send");
       sendErrorEl.hidden = false;
       submitBtn.disabled = false;
